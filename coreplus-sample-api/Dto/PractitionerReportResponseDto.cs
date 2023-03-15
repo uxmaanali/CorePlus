@@ -2,6 +2,7 @@
 
 public record PractitionerReportResponseDto
 {
+    public string id { get; set; }
     public string year { get; set; }
     public int monthIndex { get; set; }
     public string month { get; set; }

@@ -22,15 +22,18 @@ type properties = {
 function PractitionerReport({ practitioner }: properties) {
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
-  const [appointmentReq, setAppointmentReq] = useState<IPractitionerAppointmentRequest | null>(null);
+  const [appointmentReq, setAppointmentReq] =
+    useState<IPractitionerAppointmentRequest | null>(null);
   const [report, setReport] = useState<IPractitionerReportResponse[]>([]);
   const [appointment, setAppointment] = useState<IAppointment | null>(null);
+  const [currentReport, setCurrentReport] =
+    useState<IPractitionerReportResponse | null>(null);
 
   useEffect(() => {
     getReport();
   }, [practitioner]);
 
-  function getReport () {
+  function getReport() {
     if (practitioner && practitioner.id) {
       const request = {
         start: startDateRef?.current?.value ? startDateRef.current.value : null,
@@ -39,26 +42,28 @@ function PractitionerReport({ practitioner }: properties) {
       };
       axios
         .post<IPractitionerReportResponse[]>(
-          `${constants.baseUrl}/practitioners/PractitionerReport`,
+          `${constants.baseUrl}/practitioners/report`,
           request
         )
         .then(function (response) {
           setReport(response.data);
           setAppointmentReq(null);
+          setCurrentReport(null);
         })
         .catch(function (error) {
           // handle error
           console.log(error);
         });
     }
-  };
+  }
 
   function getAppointments(item: IPractitionerReportResponse) {
+    setCurrentReport(item);
     if (practitioner && practitioner.id) {
       const request: IPractitionerAppointmentRequest = {
         year: +item.year,
         month: item.monthIndex,
-        practitionerId: practitioner.id
+        practitionerId: practitioner.id,
       };
 
       setAppointmentReq(request);
@@ -66,7 +71,7 @@ function PractitionerReport({ practitioner }: properties) {
   }
 
   function assignAppointment(appointment: IAppointment | null) {
-    setAppointment(appointment)
+    setAppointment(appointment);
   }
 
   return (
@@ -125,19 +130,32 @@ function PractitionerReport({ practitioner }: properties) {
             </thead>
             <tbody>
               {report.map((item) => {
-                return <tr key={item.year + item.month} className="cursor-pointer" onClick={ () => getAppointments(item)}>
-                  <td>{item.year}</td>
-                  <td>{item.month}</td>
-                  <td>{item.cost}</td>
-                  <td>{item.revenue}</td>
-                </tr>
+                return (
+                  <tr
+                    key={item.id}
+                    onClick={() => getAppointments(item)}
+                    className={
+                      currentReport?.id == item.id
+                        ? "cursor-pointer active"
+                        : "cursor-pointer"
+                    }
+                  >
+                    <td>{item.year}</td>
+                    <td>{item.month}</td>
+                    <td>{item.cost}</td>
+                    <td>{item.revenue}</td>
+                  </tr>
+                );
               })}
             </tbody>
           </table>
         </div>
         <div className="col-4">
-              <AppointmentList request={appointmentReq} assignAppointment={assignAppointment} />
-              <AppointmentDetail appointment={appointment} />
+          <AppointmentList
+            request={appointmentReq}
+            assignAppointment={assignAppointment}
+          />
+          <AppointmentDetail appointment={appointment} />
         </div>
       </div>
     </>

@@ -21,7 +21,7 @@ public class AppointmentService
             throw new Exception("Data read error");
         }
 
-        var list = data.Where(x => x.practitioner_id == request.PractitionerId);
+        var list = data.Where(x => x.practitioner_id == request.PractitionerId).ToList();
 
         if (request.Start is not null)
         {
@@ -33,9 +33,10 @@ public class AppointmentService
             list = data.Where(x => x.date.Date <= request.End.Value.Date).ToList();
         }
 
-        var result = list.GroupBy(x => new { Month = x.date.Month, Year = x.date.Year })
+        var result = list.GroupBy(x => new { Year = x.date.Year, Month = x.date.Month })
             .Select(x => new PractitionerReportResponseDto
             {
+                id = $"{x.Key.Month}-{x.Key.Year}",
                 year = x.Key.Year.ToString(),
                 month = DateTimeFormatInfo.CurrentInfo.GetAbbreviatedMonthName(x.Key.Month),
                 monthIndex = x.Key.Month,

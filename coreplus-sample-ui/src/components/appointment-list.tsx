@@ -16,6 +16,7 @@ type properties = {
 
 function AppointmentList({ request, assignAppointment }: properties) {
   const [appointments, setAppointment] = useState<IAppointment[]>([]);
+  const [currentAppointment, setCurrentAppointment] = useState<IAppointment | null>(null);
 
   useEffect(() => {
     getAppointments();
@@ -25,12 +26,13 @@ function AppointmentList({ request, assignAppointment }: properties) {
     if (request) {
       axios
         .post<IAppointment[]>(
-          `${constants.baseUrl}/practitioners/PractitionerAppointments`,
+          `${constants.baseUrl}/practitioners/appointments`,
           request
         )
         .then(function (response) {
           setAppointment(response.data);
           assignAppointment(null);
+          setCurrentAppointment(null);
         })
         .catch(function (error) {
           // handle error
@@ -63,8 +65,12 @@ function AppointmentList({ request, assignAppointment }: properties) {
                   return (
                     <tr
                       key={item.id}
-                      className="cursor-pointer"
-                      onClick={() => assignAppointment(item)}
+                      className={
+                        currentAppointment?.id == item.id
+                          ? "cursor-pointer active"
+                          : "cursor-pointer"
+                      }
+                      onClick={() => { assignAppointment(item); setCurrentAppointment(item); }}
                     >
                       <td>{item.date}</td>
                       <td>{item.cost}</td>

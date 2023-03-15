@@ -12,7 +12,7 @@ function AppointmentDetail({ appointment }: properties) {
     <>
       {appointment && appointment.id ? (
         <div className="card">
-          <div className="card-header">{ appointment.client_name }</div>
+          <div className="card-header">Client - { appointment.client_name }</div>
           <ul className="list-group list-group-flush">
             <li className="list-group-item">Date - {appointment.date}</li>
             <li className="list-group-item">Cost - { appointment.cost }</li>

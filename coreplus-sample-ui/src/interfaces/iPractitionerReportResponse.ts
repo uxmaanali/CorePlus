@@ -1,4 +1,5 @@
 export interface IPractitionerReportResponse {
+    id: string;
     year: string;
     month: string;
     monthIndex: number;
