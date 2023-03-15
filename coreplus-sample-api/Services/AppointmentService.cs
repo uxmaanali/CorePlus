@@ -25,12 +25,12 @@ public class AppointmentService
 
         if (request.Start is not null)
         {
-            list = data.Where(x => x.date.Date >= request.Start.Value.Date).ToList();
+            list = list.Where(x => x.date.Date >= request.Start.Value.Date).ToList();
         }
 
         if (request.End is not null)
         {
-            list = data.Where(x => x.date.Date <= request.End.Value.Date).ToList();
+            list = list.Where(x => x.date.Date <= request.End.Value.Date).ToList();
         }
 
         var result = list.GroupBy(x => new { Year = x.date.Year, Month = x.date.Month })
